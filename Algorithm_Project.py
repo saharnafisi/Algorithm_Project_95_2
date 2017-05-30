@@ -1,3 +1,5 @@
+import copy
+#Global Variables:
 solvedPuzzle=[
     ['1','2','3','4'],
     ['5','6','7','8'],
@@ -14,87 +16,114 @@ def readFromFile(file_name):
         array.append(line.split("\t"))
     return array
 
-class Puzzle:
+def findStar(puzzle,starLocation):
+    for row in range(0,4):
+        for column in range(0,4):
+            if puzzle[row][column]=='*':
+                starLocation["row"]=row
+                starLocation["col"]=column
 
-    def findStar(self):
-        for row in range(0,4):
-            for column in range(0,4):
-                if self.matrix[row][column]=='*':
-                    self.currentSpaceRow=row
-                    self.currentSpaceCol=column
+def printPuzzle(puzzle):
+    if puzzle==None:
+        return print("None")
+    for line in puzzle:
+        print("%s\t%s\t%s\t%s"%(line[0],line[1],line[2],line[3]))
+        print("\n")
+    print("---------------------------")
 
-    def __init__(self,file_name):
-        self.matrix=readFromFile(file_name)
-        self.findStar()
+def moveUp(puzzle, starLocation):
+    if(starLocation["row"]>0):
+        retPuzzle=copy.deepcopy(puzzle)
+        temp=puzzle[starLocation["row"]-1][starLocation["col"]]
+        starLocation["row"]=starLocation["row"]-1
+        retPuzzle[starLocation["row"]][starLocation["col"]]='*'
+        retPuzzle[starLocation["row"]+1][starLocation["col"]]=temp
+        return retPuzzle
+    else:
+        return None
 
-    def printPuzzle(self):
-        for line in self.matrix:
-            print("%s\t%s\t%s\t%s"%(line[0],line[1],line[2],line[3]))
-            print("\n")
-        print("---------------------------")
+def moveDown(puzzle, starLocation):
+    if(starLocation["row"]<3):
+        retPuzzle=copy.deepcopy(puzzle)
+        temp=puzzle[starLocation["row"]+1][starLocation["col"]]
+        starLocation["row"]=starLocation["row"]+1
+        retPuzzle[starLocation["row"]][starLocation["col"]]='*'
+        retPuzzle[starLocation["row"]-1][starLocation["col"]]=temp
+        return retPuzzle
+    else:
+        return None
 
-    def moveUp(self):
-        if(self.currentSpaceRow>0):
-            temp=self.matrix[self.currentSpaceRow-1][self.currentSpaceCol]
-            self.currentSpaceRow=self.currentSpaceRow-1
-            self.matrix[self.currentSpaceRow][self.currentSpaceCol]='*'
-            self.matrix[self.currentSpaceRow+1][self.currentSpaceCol]=temp
-            return True
-        else:
-            return False
+def moveRight(puzzle, starLocation):
+    if(starLocation["col"]<3):
+        retPuzzle=copy.deepcopy(puzzle)
+        temp=puzzle[starLocation["row"]][starLocation["col"]+1]
+        starLocation["col"]=starLocation["col"]+1
+        retPuzzle[starLocation["row"]][starLocation["col"]]='*'
+        retPuzzle[starLocation["row"]][starLocation["col"]-1]=temp
+        return retPuzzle
+    else:
+        return None
 
-    def moveDown(self):
-        if(self.currentSpaceRow<3):
-            temp=self.matrix[self.currentSpaceRow+1][self.currentSpaceCol]
-            self.currentSpaceRow=self.currentSpaceRow+1
-            self.matrix[self.currentSpaceRow][self.currentSpaceCol]='*'
-            self.matrix[self.currentSpaceRow-1][self.currentSpaceCol]=temp
-            return True
-        else:
-            return  False
+def moveLeft(puzzle, starLocation):
+    if(starLocation["col"]>0):
+        retPuzzle=copy.deepcopy(puzzle)
+        temp=puzzle[starLocation["row"]][starLocation["col"]-1]
+        starLocation["col"]=starLocation["col"]-1
+        retPuzzle[starLocation["row"]][starLocation["col"]]='*'
+        retPuzzle[starLocation["row"]][starLocation["col"]+1]=temp
+        return retPuzzle
+    else:
+        return None
 
-    def moveRight(self):
-        if(self.currentSpaceCol<3):
-            temp=self.matrix[self.currentSpaceRow][self.currentSpaceCol+1]
-            self.currentSpaceCol=self.currentSpaceCol+1
-            self.matrix[self.currentSpaceRow][self.currentSpaceCol]='*'
-            self.matrix[self.currentSpaceRow][self.currentSpaceCol-1]=temp
-            return True
-        else:
-            return False
+def IsSolved(puzzle):
+    if(puzzle==solvedPuzzle):
+        return True
+    else:
+        return False
 
-    def moveLeft(self):
-        if(self.currentSpaceCol>0):
-            temp=self.matrix[self.currentSpaceRow][self.currentSpaceCol-1]
-            self.currentSpaceCol=self.currentSpaceCol-1
-            self.matrix[self.currentSpaceRow][self.currentSpaceCol]='*'
-            self.matrix[self.currentSpaceRow][self.currentSpaceCol+1]=temp
-            return True
-        else:
-            return False
+class Node:
+    def __init__(self,nodeDepth,nodeData,nodeParent):
+        self.depth=nodeDepth
+        self.data=nodeData
+        self.parent=nodeParent
 
-    def IsSolved(self):
-        if(self.matrix==solvedPuzzle):
-            return True
-        else:
-            return False
+    def expandNode(self):
+        expandedNodes=[]
+        
+        expandedNodes[0]=Node(self.depth+1,self.data.moveRight(),self)
+        expandedNodes[1]=Node(self.depth+1,self.data.moveLeft(),self)
+        expandedNodes[2]=Node(self.depth+1,self.data.moveUp(),self)
+        expandedNodes[3]=Node(self.depth+1,self.data.moveDown(),self)
+        return expandedNodes
 
 if __name__ == '__main__':
-    puz=Puzzle("test.txt")
-    puz.printPuzzle()
+    starLocation={"row":0,"col":0}
+    currentPuzzle=readFromFile("test.txt")
+    findStar(currentPuzzle,starLocation)
+    printPuzzle(currentPuzzle)
     while True:
-        a=input()
-        if a=='u':
-            puz.moveUp()
-        elif a=='d':
-            puz.moveDown()
-        elif a=='r':
-            puz.moveRight()
-        elif a=='l':
-            puz.moveLeft()
-        else:
-            print("invalid input!")
-        puz.printPuzzle()
-        if puz.IsSolved():
-            print("HoooOOOOOOooooraa")
+        if(IsSolved(currentPuzzle)):
+            print("HoooOOOOOraaAA")
             break
+        a=input()
+        if(a=="u"):
+            b=moveUp(currentPuzzle,starLocation)
+            if b!=None:
+                currentPuzzle=b
+            printPuzzle(b)
+        elif(a=="d"):
+            b=moveDown(currentPuzzle,starLocation)
+            if b!=None:
+                currentPuzzle=b
+            printPuzzle(b)
+        elif(a=="l"):
+            b=moveLeft(currentPuzzle,starLocation)
+            if b!=None:
+                currentPuzzle=b
+            printPuzzle(b)
+        elif(a=="r"):
+            b=moveRight(currentPuzzle,starLocation)
+            if b!=None:
+                currentPuzzle=b
+            printPuzzle(b)
+        
