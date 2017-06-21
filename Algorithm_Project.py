@@ -31,7 +31,9 @@ def printPuzzle(puzzle):
         print("\n")
     print("---------------------------")
 
-def moveUp(puzzle, starLocation):
+def moveUp(puzzle):
+    starLocation={"row":0,"col":0}
+    findStar(puzzle,starLocation)
     if(starLocation["row"]>0):
         retPuzzle=copy.deepcopy(puzzle)
         temp=puzzle[starLocation["row"]-1][starLocation["col"]]
@@ -42,7 +44,9 @@ def moveUp(puzzle, starLocation):
     else:
         return None
 
-def moveDown(puzzle, starLocation):
+def moveDown(puzzle):
+    starLocation={"row":0,"col":0}
+    findStar(puzzle,starLocation)
     if(starLocation["row"]<3):
         retPuzzle=copy.deepcopy(puzzle)
         temp=puzzle[starLocation["row"]+1][starLocation["col"]]
@@ -53,7 +57,9 @@ def moveDown(puzzle, starLocation):
     else:
         return None
 
-def moveRight(puzzle, starLocation):
+def moveRight(puzzle):
+    starLocation={"row":0,"col":0}
+    findStar(puzzle,starLocation)
     if(starLocation["col"]<3):
         retPuzzle=copy.deepcopy(puzzle)
         temp=puzzle[starLocation["row"]][starLocation["col"]+1]
@@ -64,7 +70,9 @@ def moveRight(puzzle, starLocation):
     else:
         return None
 
-def moveLeft(puzzle, starLocation):
+def moveLeft(puzzle):
+    starLocation={"row":0,"col":0}
+    findStar(puzzle,starLocation)
     if(starLocation["col"]>0):
         retPuzzle=copy.deepcopy(puzzle)
         temp=puzzle[starLocation["row"]][starLocation["col"]-1]
@@ -87,43 +95,46 @@ class Node:
         self.data=nodeData
         self.parent=nodeParent
 
-    def expandNode(self):
-        expandedNodes=[]
-        
-        expandedNodes[0]=Node(self.depth+1,self.data.moveRight(),self)
-        expandedNodes[1]=Node(self.depth+1,self.data.moveLeft(),self)
-        expandedNodes[2]=Node(self.depth+1,self.data.moveUp(),self)
-        expandedNodes[3]=Node(self.depth+1,self.data.moveDown(),self)
-        return expandedNodes
+def expandNode(node):
+    expandedNodes=[]
+    retList=[]
+    expandedNodes.append(Node(node.depth+1,moveRight(node.data),node))
+    expandedNodes.append(Node(node.depth+1,moveLeft(node.data),node))
+    expandedNodes.append(Node(node.depth+1,moveUp(node.data),node))
+    expandedNodes.append(Node(node.depth+1,moveDown(node.data),node))
+    for node in expandedNodes:
+        if node.data!=None:
+            retList.append(node)
+    return retList
+
+def branchAndBound(puzzle):
+    nodesQueue=[]
+
+    #create a root node
+    nodesQueue.append(Node(0,puzzle,None))
+
+    while True:
+        #no solution
+        if len(nodesQueue)==0: return None
+
+        #take the node from front of queue
+        node=nodesQueue.pop(0)
+
+        #if node is goal,return moves
+        if node.data==solvedPuzzle:
+            moves=[]
+            while node.parent!=None:
+                moves.append(node)
+                node=node.parent
+            return moves
+            
+        #if node is not goal,expand node
+        else:
+            nodesQueue.extend(expandNode(node))
 
 if __name__ == '__main__':
-    starLocation={"row":0,"col":0}
     currentPuzzle=readFromFile("test.txt")
-    findStar(currentPuzzle,starLocation)
-    printPuzzle(currentPuzzle)
-    while True:
-        if(IsSolved(currentPuzzle)):
-            print("HoooOOOOOraaAA")
-            break
-        a=input()
-        if(a=="u"):
-            b=moveUp(currentPuzzle,starLocation)
-            if b!=None:
-                currentPuzzle=b
-            printPuzzle(b)
-        elif(a=="d"):
-            b=moveDown(currentPuzzle,starLocation)
-            if b!=None:
-                currentPuzzle=b
-            printPuzzle(b)
-        elif(a=="l"):
-            b=moveLeft(currentPuzzle,starLocation)
-            if b!=None:
-                currentPuzzle=b
-            printPuzzle(b)
-        elif(a=="r"):
-            b=moveRight(currentPuzzle,starLocation)
-            if b!=None:
-                currentPuzzle=b
-            printPuzzle(b)
-        
+    #printPuzzle(currentPuzzle)
+    moves=branchAndBound(currentPuzzle)
+    for state in reversed(moves):
+        printPuzzle(state.data)
