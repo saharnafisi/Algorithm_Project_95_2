@@ -112,6 +112,14 @@ class Node:
         self.data = nodeData
         self.parent = nodeParent
 
+    def printPuzzle(self):
+        if self.data == None:
+            return print("None")
+        for line in self.data:
+            print("%s\t%s\t%s\t%s" % (line[0], line[1], line[2], line[3]))
+            print("\n")
+        print("---------------------------")
+
     def manhattanDistance(self):
         location = {"row": 0, "col": 0}
         correctLocation = {"row": 0, "col": 0}
@@ -123,6 +131,19 @@ class Node:
                 totalManhattanDistance += abs(location["row"] - correctLocation["row"]) + abs(
                     location["col"] - correctLocation["col"])
                 print("%d %d %d" % (i, j, totalManhattanDistance))
+        return totalManhattanDistance
+
+    def gt(self, other):
+        return (self.manhattanDistance>other.manhattanDistance)
+
+    def ge(self, other):
+        return(self.manhattanDistance >= other.manhattanDistance)
+
+    def lt(self, other):
+        return(self.manhattanDistance < other.manhattanDistance)
+
+    def le(self, other):
+        return(self.manhattanDistance <= other.manhattanDistance)
 
 
 def expandNode(node):
@@ -169,11 +190,16 @@ if __name__ == '__main__':
     currentPuzzle = readFromFile("test.txt")
     # manhattanDistance(currentPuzzle)
     # printPuzzle(currentPuzzle)
-    while True:
+    node=Node(0,currentPuzzle,0)
+    node.printPuzzle();
+    node2=Node(0,solvedPuzzle,0)
+    printPuzzle(node>node2)
+
+    """while True:
         choice = int(input("enter 1 for greedy and 2 for branch and bound: "))
         if (choice == 1):
             print("manhattan distances: ")
-            node=Node(0,currentPuzzle,0)
+            node = Node(0, currentPuzzle, 0)
             # manhattanDistance(currentPuzzle)
             node.manhattanDistance()
             break
@@ -184,4 +210,4 @@ if __name__ == '__main__':
                 printPuzzle(state.data)
             break
         else:
-            print("invalid choice...try again ")
+            print("invalid choice...try again ")"""
