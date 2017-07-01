@@ -26,7 +26,7 @@ def findStar(puzzle, starLocation):
                 starLocation["col"] = column
 
 
-def findLocation(puzzle,number ,location):
+def findLocation(puzzle, number, location):
     for row in range(0, 4):
         for column in range(0, 4):
             if puzzle[row][column] == number:
@@ -106,32 +106,23 @@ def IsSolved(puzzle):
         return False
 
 
-def manhattanDistance(puzzle):
-    location = {"row": 0, "col": 0}
-    correctLocation = {"row": 0, "col": 0}
-    totalManhattanDistance=0
-    for i in range(0, 4):
-        for j in range(0, 4):
-            findLocation(puzzle, puzzle[i][j], location)
-            findLocation(solvedPuzzle, puzzle[i][j], correctLocation)
-            totalManhattanDistance += abs(location["row"] - correctLocation["row"]) + abs(
-                location["col"] - correctLocation["col"])
-            print("%d %d %d"%(i,j,totalManhattanDistance))
-    """for i in range(0, 4):
-        for j in range(0, 4):
-            totalManhattanDistance += abs(location["row"] - correctLocation["row"]) + abs(
-                location["col"] - correctLocation["col"])
-            print("%d %d %d"%(i,j,totalManhattanDistance))"""
-
-
 class Node:
     def __init__(self, nodeDepth, nodeData, nodeParent):
         self.depth = nodeDepth
         self.data = nodeData
         self.parent = nodeParent
 
-    # def manhattanDistance(self):
-        # for distance in range(0,16):
+    def manhattanDistance(self):
+        location = {"row": 0, "col": 0}
+        correctLocation = {"row": 0, "col": 0}
+        totalManhattanDistance = 0
+        for i in range(0, 4):
+            for j in range(0, 4):
+                findLocation(self.data, self.data[i][j], location)
+                findLocation(solvedPuzzle, self.data[i][j], correctLocation)
+                totalManhattanDistance += abs(location["row"] - correctLocation["row"]) + abs(
+                    location["col"] - correctLocation["col"])
+                print("%d %d %d" % (i, j, totalManhattanDistance))
 
 
 def expandNode(node):
@@ -176,13 +167,15 @@ def branchAndBound(puzzle):
 
 if __name__ == '__main__':
     currentPuzzle = readFromFile("test.txt")
-    #manhattanDistance(currentPuzzle)
+    # manhattanDistance(currentPuzzle)
     # printPuzzle(currentPuzzle)
     while True:
         choice = int(input("enter 1 for greedy and 2 for branch and bound: "))
         if (choice == 1):
             print("manhattan distances: ")
-            manhattanDistance(currentPuzzle)
+            node=Node(0,currentPuzzle,0)
+            # manhattanDistance(currentPuzzle)
+            node.manhattanDistance()
             break
 
         elif choice == 2:
