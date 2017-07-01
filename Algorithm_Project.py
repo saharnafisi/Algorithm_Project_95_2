@@ -133,18 +133,7 @@ class Node:
                 print("%d %d %d" % (i, j, totalManhattanDistance))
         return totalManhattanDistance
 
-    def gt(self, other):
-        return (self.manhattanDistance>other.manhattanDistance)
-
-    def ge(self, other):
-        return(self.manhattanDistance >= other.manhattanDistance)
-
-    def lt(self, other):
-        return(self.manhattanDistance < other.manhattanDistance)
-
-    def le(self, other):
-        return(self.manhattanDistance <= other.manhattanDistance)
-
+    
 
 def expandNode(node):
     expandedNodes = []
@@ -184,24 +173,50 @@ def branchAndBound(puzzle):
         # if node is not goal,expand node
         else:
             nodesQueue.extend(expandNode(node))
+def greedy(puzzle):
+    nodesQueue = []
+
+    # create a root node
+    nodesQueue.append(Node(0, puzzle, None))
+
+    while True:
+        # no solution
+        if len(nodesQueue) == 0:
+            return None
+
+        nodesQueue.sort(key=lambda x:)
+
+        # take the node from front of queue
+        node = nodesQueue.pop(0)
+
+        # if node is goal,return moves
+        if node.data == solvedPuzzle:
+            moves = []
+            while node.parent != None:
+                moves.append(node)
+                node = node.parent
+            return moves
+
+        # if node is not goal,expand node
+        else:
+            nodesQueue.extend(expandNode(node))
 
 
 if __name__ == '__main__':
     currentPuzzle = readFromFile("test.txt")
-    # manhattanDistance(currentPuzzle)
+    """# manhattanDistance(currentPuzzle)
     # printPuzzle(currentPuzzle)
     node=Node(0,currentPuzzle,0)
     node.printPuzzle();
     node2=Node(0,solvedPuzzle,0)
-    printPuzzle(node>node2)
+    printPuzzle(node>node2)"""
 
-    """while True:
+    while True:
         choice = int(input("enter 1 for greedy and 2 for branch and bound: "))
         if (choice == 1):
-            print("manhattan distances: ")
-            node = Node(0, currentPuzzle, 0)
-            # manhattanDistance(currentPuzzle)
-            node.manhattanDistance()
+            moves = greedy(currentPuzzle)
+            for state in reversed(moves):
+                printPuzzle(state.data)
             break
 
         elif choice == 2:
@@ -210,4 +225,4 @@ if __name__ == '__main__':
                 printPuzzle(state.data)
             break
         else:
-            print("invalid choice...try again ")"""
+            print("invalid choice...try again ")
