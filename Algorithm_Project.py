@@ -25,6 +25,8 @@ def findStar(puzzle, starLocation):
                 starLocation["row"] = row
                 starLocation["col"] = column
 
+# return location of a digit in puzzle
+
 
 def findLocation(puzzle, number, location):
     for row in range(0, 4):
@@ -111,14 +113,7 @@ class Node:
         self.depth = nodeDepth
         self.data = nodeData
         self.parent = nodeParent
-
-    def printPuzzle(self):
-        if self.data == None:
-            return print("None")
-        for line in self.data:
-            print("%s\t%s\t%s\t%s" % (line[0], line[1], line[2], line[3]))
-            print("\n")
-        print("---------------------------")
+        self.manhattan = 0
 
     def manhattanDistance(self):
         location = {"row": 0, "col": 0}
@@ -131,9 +126,8 @@ class Node:
                 totalManhattanDistance += abs(location["row"] - correctLocation["row"]) + abs(
                     location["col"] - correctLocation["col"])
                 print("%d %d %d" % (i, j, totalManhattanDistance))
-        return totalManhattanDistance
+        self.manhattan = totalManhattanDistance
 
-    
 
 def expandNode(node):
     expandedNodes = []
@@ -173,6 +167,8 @@ def branchAndBound(puzzle):
         # if node is not goal,expand node
         else:
             nodesQueue.extend(expandNode(node))
+
+
 def greedy(puzzle):
     nodesQueue = []
 
@@ -184,7 +180,8 @@ def greedy(puzzle):
         if len(nodesQueue) == 0:
             return None
 
-        nodesQueue.sort(key=lambda x:)
+        # sort node queue by manhattan distance of nodes
+        nodesQueue.sort(key=lambda x: x.manhattan)
 
         # take the node from front of queue
         node = nodesQueue.pop(0)
@@ -204,12 +201,6 @@ def greedy(puzzle):
 
 if __name__ == '__main__':
     currentPuzzle = readFromFile("test.txt")
-    """# manhattanDistance(currentPuzzle)
-    # printPuzzle(currentPuzzle)
-    node=Node(0,currentPuzzle,0)
-    node.printPuzzle();
-    node2=Node(0,solvedPuzzle,0)
-    printPuzzle(node>node2)"""
 
     while True:
         choice = int(input("enter 1 for greedy and 2 for branch and bound: "))
@@ -226,3 +217,4 @@ if __name__ == '__main__':
             break
         else:
             print("invalid choice...try again ")
+
