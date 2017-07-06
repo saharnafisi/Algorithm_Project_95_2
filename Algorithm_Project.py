@@ -1,4 +1,5 @@
 import copy
+import bisect
 # Global Variables:
 solvedPuzzle = [
     ['1', '2', '3', '4'],
